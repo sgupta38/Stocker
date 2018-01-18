@@ -10,6 +10,9 @@ import time
 import win32con
 import win32gui
 from win32api import GetModuleHandle
+import traceback
+from nsetools import Nse
+import json
 
 # Often I work in private network so I need to provide proxies. You can update as per your requirement or simply just ignore.
 proxies = {"http": "http://10.10.5.18:8080",
@@ -66,36 +69,26 @@ def balloon_tip(title, msg):
     w = WindowsBalloonTip(title, msg)
     return w
 
-## Function for web scraping the 'Share' value
-def findSharePrice(url):
-    #res = requests.get(url, proxies=proxies)  ## Private Network
-    res = requests.get(url)
-    res.raise_for_status()
-    soup = bs4.BeautifulSoup(res.text, 'html.parser')
-    nseElems = soup.select('#ref_649130089307642_l')
-    #print('Price: '+ nseElems[0].text.strip())
-    count = nseElems[0].text.strip()
-    count = count.replace(",", "")
-    #print('Plane Price: '+ count)
-    return float(count)
+def printData(stockData):
 
-currentPrice = findSharePrice('https://finance.google.com/finance?q=NSE:QUICKHEAL')
-print('Current Price is: ' + str(currentPrice))
+    ## Here you can add more data if you want.
+    data = '\n'.join([
+                    'Current: ' + str(stockData['lastPrice']),
+                    'High: ' + str(stockData['dayHigh']),
+                    'Low: ' + str(stockData['dayLow']),
+                    'Average Price: ' + str(stockData['averagePrice']),
+                     ])
+    return data
 
-print('Enter the MINIMUM threshold value for which you want to get notify: ')
-minThreshold = input()
+nse = Nse() # Constructor
 
-print('Enter the MAXIMUM threshold value for which you want to get notify: ')
-maxThreshold = input()
+print('Enter the STOCK CODE to monitor:')
+code = input()
+stock_quote = nse.get_quote(code, as_json=True)
+response = json.loads(stock_quote)
+data = printData(response)
+print(data)
 
-while(1):
-  actual = findSharePrice('https://finance.google.com/finance?q=NSE:QUICKHEAL')
-  if(float(actual) == float(minThreshold) ):
-    print('Value is equal to Minimum threshold')
-    balloon_tip('QUICKHEAL MINIMUM Threshold Value Reached...', 'Price is: ' + str(actual))
-    #break;
+balloon_tip(str(response['companyName']), data)
 
-  elif(float(actual) == float(maxThreshold)):
-    print('Value is equal to maximum threshold')
-    balloon_tip('QUICKHEAL MAXIMUM Threshold Value Reached...', 'Price is: ' + str(actual))
-    #break;
+#print(response['lastPrice'])
