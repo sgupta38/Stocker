@@ -1,7 +1,8 @@
 ##
 ##  Author: Sonu Gupta
 ##  Date: 17-Jan-2018
-##  Purpose: This continously monitors for the value of 'stock' and whenever ant change happens, gives notification for user.
+##  Purpose: This continously monitors for the value of 'stock' and whenever any change happens, gives notification to user.
+##
 
 import bs4, requests
 import os
