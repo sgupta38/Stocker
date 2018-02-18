@@ -8,4 +8,4 @@ _Prerequisite:_
 For *stock code* of the company, please refer the [Stock_Codes.txt file](https://github.com/sonugupta4636/Stocker/blob/master/Stock%20Informer/stock_codes.txt)
  
  
-![alt text](https://github.com/sonugupta4636/Stocker/blob/master/observer_notifier/on.png)
+![alt text](https://github.com/sonugupta4636/Stocker/blob/master/Stock%20Informer/stock_info.png)
