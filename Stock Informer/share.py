@@ -75,9 +75,15 @@ def printData(stockData):
     ## Here you can add more data if you want.
     data = '\n'.join([
                     'Current: ' + str(stockData['lastPrice']),
-                    'High: ' + str(stockData['dayHigh']),
-                    'Low: ' + str(stockData['dayLow']),
+                    'Day High: ' + str(stockData['dayHigh']),
+                    'Day Low: ' + str(stockData['dayLow']),
                     'Average Price: ' + str(stockData['averagePrice']),
+					'Extreme Loss Margin: ' + str(stockData['extremeLossMargin']),
+					'Face Value: ' + str(stockData['faceValue']),
+					'Purpose: ' + str(stockData['purpose']),
+					'Total Traded Value: ' + str(stockData['totalTradedValue']),
+					'Total Sell Quantity: ' + str(stockData['totalSellQuantity']),
+					'Total Traded Volume: ' + str(stockData['totalTradedVolume'])
                      ])
     return data
 
