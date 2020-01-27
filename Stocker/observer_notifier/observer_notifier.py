@@ -1,24 +1,13 @@
-##
-##  Author: Sonu Gupta
-##  Date: 18-Jan-2018
-##  Purpose: This continously monitors for the value of 'stock' and whenever any change happens, gives notification to user.
-##
 
-import bs4, requests
+import pprint
+from pprint import pprint
 import os
 import sys
 import time
 import win32con
 import win32gui
 from win32api import GetModuleHandle
-import traceback
-from nsetools import Nse
 import json
-
-# Often I work in private network so I need to provide proxies. You can update as per your requirement or simply just ignore.
-proxies = {"http": "http://10.10.5.18:8080",
-           "https": "http://10.10.5.18:8080"}
-
 
 class WindowsBalloonTip:
     def __init__(self, title, msg):
@@ -53,7 +42,7 @@ class WindowsBalloonTip:
                                    win32con.WM_USER+20, hicon,
                                    "Balloon  tooltip", msg, 200, title))
         # self.show_balloon(title, msg)
-        time.sleep(14)
+        time.sleep(20)
         win32gui.DestroyWindow(self.hwnd)
         win32gui.UnregisterClass(class_atom, hinst)
         self.destroyed = True
@@ -66,36 +55,33 @@ class WindowsBalloonTip:
     def isDestroyed(self):
         return self.destroyed
 
+
 def balloon_tip(title, msg):
     w = WindowsBalloonTip(title, msg)
     return w
 
-def printData(stockData):
+#############################################
 
-    ## Here you can add more data if you want.
-    data = '\n'.join([
-                    'Current: ' + str(stockData['lastPrice']),
-                    'Day High: ' + str(stockData['dayHigh']),
-                    'Day Low: ' + str(stockData['dayLow']),
-                    'Average Price: ' + str(stockData['averagePrice']),
-					'Extreme Loss Margin: ' + str(stockData['extremeLossMargin']),
-					'Face Value: ' + str(stockData['faceValue']),
-					'Purpose: ' + str(stockData['purpose']),
-					'Total Traded Value: ' + str(stockData['totalTradedValue']),
-					'Total Sell Quantity: ' + str(stockData['totalSellQuantity']),
-					'Total Traded Volume: ' + str(stockData['totalTradedVolume'])
-                     ])
-    return data
+import bs4, requests
 
-nse = Nse() # Constructor
+def findSharePrice(url):
+    res = requests.get(url)
+    res.raise_for_status()
+    soup = bs4.BeautifulSoup(res.text, 'html.parser')
+    elems = soup.select('body > div.container.container--game.wrapper.clearfix > div.content-region.region--full.game-count.full-width > div > div > h3')
+    #print('counter: '+ elems[0].text.strip())
+    count = elems[0].text.strip()
+    count = count.replace(",", "")
+    #print('My counter: '+ count)
+    return int(count)
 
-print('Enter the STOCK CODE to monitor:')
-code = input()
-stock_quote = nse.get_quote(code, as_json=True)
-response = json.loads(stock_quote)
-data = printData(response)
-print(data)
+print('Enter the threshold value for which you want to get notify: ')
+threshold = input()
 
-balloon_tip(str(response['companyName']), data)
+while(1):
+  actual = findSharePrice('https://www.marketwatch.com/vse')
+  if(actual == int(threshold) ):
+    print('Value is equal to threshold')
+    balloon_tip('Threshold Value Reached...', ' Put your message here. Value is equal to threshold')
+    break;
 
-#print(response['lastPrice'])

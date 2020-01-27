@@ -1,24 +1,11 @@
-##
-##  Author: Sonu Gupta
-##  Date: 18-Jan-2018
-##  Purpose: This continously monitors for the value of 'stock' and whenever any change happens, gives notification to user.
-##
+#Code Belongs to : https://gist.github.com/brousch/6523559
 
-import bs4, requests
 import os
 import sys
 import time
 import win32con
 import win32gui
 from win32api import GetModuleHandle
-import traceback
-from nsetools import Nse
-import json
-
-# Often I work in private network so I need to provide proxies. You can update as per your requirement or simply just ignore.
-proxies = {"http": "http://10.10.5.18:8080",
-           "https": "http://10.10.5.18:8080"}
-
 
 class WindowsBalloonTip:
     def __init__(self, title, msg):
@@ -53,7 +40,7 @@ class WindowsBalloonTip:
                                    win32con.WM_USER+20, hicon,
                                    "Balloon  tooltip", msg, 200, title))
         # self.show_balloon(title, msg)
-        time.sleep(14)
+        time.sleep(10)
         win32gui.DestroyWindow(self.hwnd)
         win32gui.UnregisterClass(class_atom, hinst)
         self.destroyed = True
@@ -70,32 +57,4 @@ def balloon_tip(title, msg):
     w = WindowsBalloonTip(title, msg)
     return w
 
-def printData(stockData):
-
-    ## Here you can add more data if you want.
-    data = '\n'.join([
-                    'Current: ' + str(stockData['lastPrice']),
-                    'Day High: ' + str(stockData['dayHigh']),
-                    'Day Low: ' + str(stockData['dayLow']),
-                    'Average Price: ' + str(stockData['averagePrice']),
-					'Extreme Loss Margin: ' + str(stockData['extremeLossMargin']),
-					'Face Value: ' + str(stockData['faceValue']),
-					'Purpose: ' + str(stockData['purpose']),
-					'Total Traded Value: ' + str(stockData['totalTradedValue']),
-					'Total Sell Quantity: ' + str(stockData['totalSellQuantity']),
-					'Total Traded Volume: ' + str(stockData['totalTradedVolume'])
-                     ])
-    return data
-
-nse = Nse() # Constructor
-
-print('Enter the STOCK CODE to monitor:')
-code = input()
-stock_quote = nse.get_quote(code, as_json=True)
-response = json.loads(stock_quote)
-data = printData(response)
-print(data)
-
-balloon_tip(str(response['companyName']), data)
-
-#print(response['lastPrice'])
+balloon_tip('This is the title', 'Here, You can specify any message you want user to see.')
